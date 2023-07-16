@@ -18,6 +18,7 @@ func main() {
 	root := <-c
 	results := findWords(root, letters)
 	sort.Strings(results)
+	fmt.Println("\nResults:")
 	for _, result := range results {
 		fmt.Println(result)
 	}
@@ -75,7 +76,7 @@ type Node struct {
 func getUserLetters() string {
 	fmt.Println("Enter in the letters you want to solve the puzzle for in a single line.")
 	fmt.Println("Make sure the key letter is the first one.")
-	fmt.Print("Letters: ")
+	fmt.Print("\nLetters: ")
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
@@ -84,7 +85,21 @@ func getUserLetters() string {
 	// clean up string as much as we can
 	line = strings.ToLower(line)
 	line = regexp.MustCompile("[^a-z]+").ReplaceAllString(line, "")
-	return line
+	return removeDuplicateRunes(line)
+}
+
+func removeDuplicateRunes(line string) string {
+	set := make(map[rune]bool)
+	result := []rune{}
+
+	for _, char := range line {
+		if !set[char] {
+			result = append(result, char)
+			set[char] = true
+		}
+	}
+
+	return string(result)
 }
 
 func findWords(root *Node, letters string) []string {

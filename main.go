@@ -6,14 +6,20 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
+	"unicode/utf8"
 )
 
 func main() {
 	root := Node{}
 	buildTrieFromDictionary(&root)
 	letters := getUserLetters()
-	fmt.Println(letters)
+	results := findWords(&root, letters)
+	sort.Strings(results)
+	for _, result := range results {
+		fmt.Println(result)
+	}
 }
 
 func buildTrieFromDictionary(trie *Node) {
@@ -74,4 +80,39 @@ func getUserLetters() string {
 	line = strings.ToLower(line)
 	line = regexp.MustCompile("[^a-z]+").ReplaceAllString(line, "")
 	return line
+}
+
+func findWords(root *Node, letters string) []string {
+	results := []string{}
+	findWordsRecursive(root, letters, &results, &[]rune{})
+	return results
+}
+
+func runeSliceContains(slice *[]rune, target rune) bool {
+	for _, char := range *slice {
+		if char == target {
+			return true
+		}
+	}
+	return false
+}
+
+func findWordsRecursive(node *Node, letters string, results *[]string, combination *[]rune) {
+	if node.IsTerminator {
+		// check that the special letter is in the word
+		targetRune, _ := utf8.DecodeRuneInString(letters)
+		if runeSliceContains(combination, targetRune) {
+			*results = append(*results, string(*combination))
+		}
+	}
+
+	for _, char := range letters {
+		if node.Children != nil && node.Children[char] != nil {
+			// add the char to our current combination
+			*combination = append(*combination, char)
+			findWordsRecursive(node.Children[char], letters, results, combination)
+			// remove the char from our current combination
+			*combination = (*combination)[:len(*combination)-1]
+		}
+	}
 }

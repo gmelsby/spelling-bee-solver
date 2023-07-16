@@ -2,13 +2,18 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
+	"regexp"
+	"strings"
 )
 
 func main() {
 	root := Node{}
 	buildTrieFromDictionary(&root)
+	letters := getUserLetters()
+	fmt.Println(letters)
 }
 
 func buildTrieFromDictionary(trie *Node) {
@@ -54,4 +59,19 @@ func putWordIntoTrie(word string, trie *Node) {
 type Node struct {
 	Children     map[rune]*Node
 	IsTerminator bool
+}
+
+func getUserLetters() string {
+	fmt.Println("Enter in the letters you want to solve the puzzle for in a single line.")
+	fmt.Println("Make sure the key letter is the first one.")
+	fmt.Print("Letters: ")
+
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	line := scanner.Text()
+
+	// clean up string as much as we can
+	line = strings.ToLower(line)
+	line = regexp.MustCompile("[^a-z]+").ReplaceAllString(line, "")
+	return line
 }

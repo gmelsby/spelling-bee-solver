@@ -12,17 +12,21 @@ import (
 )
 
 func main() {
-	root := Node{}
-	buildTrieFromDictionary(&root)
+	c := make(chan *Node)
+	go buildTrieFromDictionary(c)
 	letters := getUserLetters()
-	results := findWords(&root, letters)
+	root := <-c
+	results := findWords(root, letters)
 	sort.Strings(results)
 	for _, result := range results {
 		fmt.Println(result)
 	}
 }
 
-func buildTrieFromDictionary(trie *Node) {
+// builds a trie from the list of words in a file
+// passes built tree back through channel
+func buildTrieFromDictionary(c chan *Node) {
+	trie := &Node{}
 	file, err := os.Open("words_alpha.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -33,13 +37,13 @@ func buildTrieFromDictionary(trie *Node) {
 	for scanner.Scan() {
 		if len(scanner.Text()) >= 4 {
 			putWordIntoTrie(scanner.Text(), trie)
-			log.Print(scanner.Text())
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+	c <- trie
 }
 
 // adds the passed-in word to the passed-in Trie
@@ -67,6 +71,7 @@ type Node struct {
 	IsTerminator bool
 }
 
+// gets user input and cleans it
 func getUserLetters() string {
 	fmt.Println("Enter in the letters you want to solve the puzzle for in a single line.")
 	fmt.Println("Make sure the key letter is the first one.")
@@ -88,6 +93,7 @@ func findWords(root *Node, letters string) []string {
 	return results
 }
 
+// returns true if the rune is present in the slice, otherwise false
 func runeSliceContains(slice *[]rune, target rune) bool {
 	for _, char := range *slice {
 		if char == target {

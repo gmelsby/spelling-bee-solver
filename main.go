@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,13 +13,24 @@ import (
 )
 
 func main() {
+	// get a head start on building the trie
 	c := make(chan *Node)
 	go buildTrieFromDictionary(c)
+	// handle flag
+	interactive := flag.Bool("i", false, "a bool indicating whether or not user prompts will be displayed")
+	flag.Parse()
+	// only give user instructions if interactive
+	if *interactive {
+		promptUserLetters()
+	}
 	letters := getUserLetters()
+	// wait until trie construction complete
 	root := <-c
 	results := findWords(root, letters)
 	sort.Strings(results)
-	fmt.Println("\nResults:")
+	if *interactive {
+		fmt.Println("\nResults:")
+	}
 	for _, result := range results {
 		fmt.Println(result)
 	}
@@ -72,12 +84,15 @@ type Node struct {
 	IsTerminator bool
 }
 
-// gets user input and cleans it
-func getUserLetters() string {
+// prints instructions to the user
+func promptUserLetters() {
 	fmt.Println("Enter in the letters you want to solve the puzzle for in a single line.")
 	fmt.Println("Make sure the key letter is the first one.")
 	fmt.Print("\nLetters: ")
+}
 
+// gets user input and cleans it
+func getUserLetters() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	line := scanner.Text()
@@ -88,6 +103,7 @@ func getUserLetters() string {
 	return removeDuplicateRunes(line)
 }
 
+// cleans up string by returning a new string in the same order with max one of each rune
 func removeDuplicateRunes(line string) string {
 	set := make(map[rune]bool)
 	result := []rune{}

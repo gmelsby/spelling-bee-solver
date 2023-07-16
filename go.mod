@@ -1,3 +1,3 @@
-module github.com/gmelsby/spellingbee-solver
+module github.com/gmelsby/spelling-bee-solver
 
 go 1.19

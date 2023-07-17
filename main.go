@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -16,19 +15,34 @@ func main() {
 	// get a head start on building the trie
 	c := make(chan *Node)
 	go buildTrieFromDictionary(c)
-	// handle flag
-	interactive := flag.Bool("i", false, "a bool indicating whether or not user prompts will be displayed")
-	flag.Parse()
-	// only give user instructions if interactive
-	if *interactive {
+
+  // check if we have CLI argument
+  letters := ""
+  interactive := len(os.Args) == 1
+
+  if !interactive{
+    letters = os.Args[1] 
+  }
+
+  // check we don't have too many CLI arguments
+  if len(os.Args) > 2 {
+    fmt.Fprintln(os.Stderr, "error: too many arguments passed in!")
+    return
+  }
+
+	if interactive {
 		promptUserLetters()
+    letters = getUserLetters()
 	}
-	letters := getUserLetters()
+
+  // strip non-letters and duplicates, transform to lowercase
+  letters = cleanString(letters)
+
 	// wait until trie construction complete
 	root := <-c
 	results := findWords(root, letters)
 	sort.Strings(results)
-	if *interactive {
+	if interactive {
 		fmt.Println("\nResults:")
 	}
 	for _, result := range results {
@@ -91,14 +105,17 @@ func promptUserLetters() {
 	fmt.Print("\nLetters: ")
 }
 
-// gets user input and cleans it
+// gets user input
 func getUserLetters() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	line := scanner.Text()
+  return line
+}
 
-	// clean up string as much as we can
-	line = strings.ToLower(line)
+// cleans up string and returns clean string
+func cleanString(line string) string {
+  line = strings.ToLower(line)
 	line = regexp.MustCompile("[^a-z]+").ReplaceAllString(line, "")
 	return removeDuplicateRunes(line)
 }

@@ -10,10 +10,11 @@ However, other word lists omit certain valid answers, and it is preferable to ge
 ### How to run
 - Make sure you have Go installed
 - Clone this repo
-- In the project root, run the command `go run . -i`
+- In the project root, run the command `go run .`
 - Follow the instructions printed to stdout
 
-### Output to file
-If you wish to output to file and are on a Unix (e.g. Linux, MacOS) system, you can run the command \
-`echo [letters] | go run . > output.txt` \
-with `[letters]` replaced with a string of the letters in the puzzle with the required letter first.
+### Enter letters as argument
+If you wish to enter your letters as a command line argument (say for redirecting the output to a file) you can run the command \
+`go run . [letters]` \
+with `[letters]` replaced with a string of the letters in the puzzle with the required letter first. \
+No instructions or user prompts are printed to stdout if you run the program in this manner. You will receive only a list of answers.

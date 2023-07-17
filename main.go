@@ -16,27 +16,27 @@ func main() {
 	c := make(chan *Node)
 	go buildTrieFromDictionary(c)
 
-  // check if we have CLI argument
-  letters := ""
-  interactive := len(os.Args) == 1
+	// check if we have CLI argument
+	letters := ""
+	interactive := len(os.Args) == 1
 
-  if !interactive{
-    letters = os.Args[1] 
-  }
+	if !interactive {
+		letters = os.Args[1]
+	}
 
-  // check we don't have too many CLI arguments
-  if len(os.Args) > 2 {
-    fmt.Fprintln(os.Stderr, "error: too many arguments passed in!")
-    return
-  }
+	// check we don't have too many CLI arguments
+	if len(os.Args) > 2 {
+		fmt.Fprintln(os.Stderr, "error: too many arguments passed in!")
+		return
+	}
 
 	if interactive {
 		promptUserLetters()
-    letters = getUserLetters()
+		letters = getUserLetters()
 	}
 
-  // strip non-letters and duplicates, transform to lowercase
-  letters = cleanString(letters)
+	// strip non-letters and duplicates, transform to lowercase
+	letters = cleanString(letters)
 
 	// wait until trie construction complete
 	root := <-c
@@ -110,12 +110,12 @@ func getUserLetters() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	line := scanner.Text()
-  return line
+	return line
 }
 
 // cleans up string and returns clean string
 func cleanString(line string) string {
-  line = strings.ToLower(line)
+	line = strings.ToLower(line)
 	line = regexp.MustCompile("[^a-z]+").ReplaceAllString(line, "")
 	return removeDuplicateRunes(line)
 }

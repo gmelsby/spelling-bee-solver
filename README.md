@@ -17,4 +17,4 @@ However, other word lists omit certain valid answers, and it is preferable to ge
 If you wish to enter your letters as a command line argument (say for redirecting the output to a file) you can run the command \
 `go run . [letters]` \
 with `[letters]` replaced with a string of the letters in the puzzle with the required letter first. \
-No instructions or user prompts are printed to stdout if you run the program in this manner. You will receive only a list of answers.
+No instructions or user prompts are printed to stdout if you run the program in this manner. You will receive only a list of answers. Perfect for redirecting output to a file!
